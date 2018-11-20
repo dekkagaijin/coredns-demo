@@ -90,15 +90,15 @@ func main() {
 	m.Rcode = dns.RcodeSuccess
 
 	co := new(dns.Conn)
-	tcp := "tcp"
-	if co.Conn, err = net.DialTimeout(tcp, nameserver, 2*time.Second); err != nil {
-		log.Fatal("Dialing " + nameserver + " failed: " + err.Error() + "\n")
-	}
-	defer co.Close()
 
 	for _, n := range qnames {
+		if co.Conn == nil {
+			if co.Conn, err = net.DialTimeout("tcp", nameserver, 2*time.Second); err != nil {
+				log.Fatal("Dialing " + nameserver + " failed: " + err.Error() + "\n")
+			}
+			defer co.Close()
+		}
 		m.Question[0] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeA, Qclass: dns.ClassINET}
-		//m.Question[1] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeAAAA, Qclass: dns.ClassINET}
 		m.Id = dns.Id()
 
 		co.SetReadDeadline(time.Now().Add(2 * time.Second))
@@ -107,11 +107,13 @@ func main() {
 		then := time.Now()
 		if err := co.WriteMsg(m); err != nil {
 			fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
+			co.Conn = nil
 			continue
 		}
 		r, err := co.ReadMsg()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, ";; Reading response for %q failed: %s\n", n, err.Error())
+			co.Conn = nil
 			continue
 		}
 		rtt := time.Since(then)
