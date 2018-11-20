@@ -36,7 +36,7 @@ import (
 var (
 	hostnameFile = flag.String("hostname-file", "data/hostnames.txt", "The file from which to read hostnames to lookup via dns. The file should have exactly one hostname per line.")
 
-	ns   = flag.String("nameserver", "", "port number to use")
+	ns   = flag.String("nameserver", "", "The nameserver to use, e.g. `8.8.8.8`")
 	port = flag.Int("port", 53, "port number to use")
 	aa   = flag.Bool("aa", false, "set AA (Authoritative) flag in query")
 	ad   = flag.Bool("ad", false, "set AD (AuthenticatedData) flag in query")
@@ -60,11 +60,10 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		nameserver = "@" + conf.Servers[0]
+		nameserver = conf.Servers[0]
 	}
 	fmt.Println("nameserver: " + nameserver)
 
-	nameserver = string([]byte(nameserver)[1:]) // chop off @
 	// /etc/resolv.conf adds [ and ], breaking net.ParseIP.
 	if nameserver[0] == '[' && nameserver[len(nameserver)-1] == ']' {
 		nameserver = nameserver[1 : len(nameserver)-1]
