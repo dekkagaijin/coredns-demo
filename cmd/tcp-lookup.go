@@ -89,10 +89,11 @@ func main() {
 	m.Opcode = dns.StringToOpcode["QUERY"]
 	m.Rcode = dns.RcodeSuccess
 
-	co := new(dns.Conn)
+	var co *dns.Conn
 
 	for _, n := range qnames {
-		if co.Conn == nil {
+		if co == nil {
+			co = new(dns.Conn)
 			if co.Conn, err = net.DialTimeout("tcp", nameserver, 2*time.Second); err != nil {
 				log.Fatal("Dialing " + nameserver + " failed: " + err.Error() + "\n")
 			}
@@ -107,13 +108,15 @@ func main() {
 		then := time.Now()
 		if err := co.WriteMsg(m); err != nil {
 			fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
-			co.Conn = nil
+			co.Close()
+			co = nil
 			continue
 		}
 		r, err := co.ReadMsg()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, ";; Reading response for %q failed: %s\n", n, err.Error())
-			co.Conn = nil
+			co.Close()
+			co = nil
 			continue
 		}
 		rtt := time.Since(then)
