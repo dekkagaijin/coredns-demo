@@ -27,7 +27,6 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/dekkagaijin/coredns-demo/data"
 	"github.com/miekg/dns"
@@ -76,7 +75,7 @@ func main() {
 	}
 
 	c := new(dns.Client)
-	c.Net = "tcp"
+
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			Authoritative:     *aa,
@@ -90,38 +89,33 @@ func main() {
 	m.Opcode = dns.StringToOpcode["QUERY"]
 	m.Rcode = dns.RcodeSuccess
 
-	co := new(dns.Conn)
-	tcp := "tcp"
-	if co.Conn, err = net.DialTimeout(tcp, nameserver, 2*time.Second); err != nil {
-		log.Fatal("Dialing " + nameserver + " failed: " + err.Error() + "\n")
-	}
-	defer co.Close()
-
 	for _, v := range qnames {
 		m.Question[0] = dns.Question{Name: dns.Fqdn(v), Qtype: dns.TypeA, Qclass: dns.ClassINET}
-		//m.Question[1] = dns.Question{Name: dns.Fqdn(v), Qtype: dns.TypeAAAA, Qclass: dns.ClassINET}
 		m.Id = dns.Id()
 
-		co.SetReadDeadline(time.Now().Add(2 * time.Second))
-		co.SetWriteDeadline(time.Now().Add(2 * time.Second))
+		fmt.Printf("%s", m.String())
+		fmt.Printf("\n;; size: %d bytes\n\n", m.Len())
 
-		then := time.Now()
-		if err := co.WriteMsg(m); err != nil {
-			fmt.Fprintf(os.Stderr, ";; %s\n", err.Error())
+		c.Net = "udp"
+		r, rtt, err := c.Exchange(m, nameserver)
+
+		switch err {
+		case nil:
+			//do nothing
+		case dns.ErrTruncated:
+			fmt.Printf(";; Truncated, trying TCP\n")
+			c.Net = "tcp"
+			r, rtt, err = c.Exchange(m, nameserver)
+		default:
+			fmt.Printf(";; %s\n", err.Error())
 			continue
 		}
-		r, err := co.ReadMsg()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, ";; %s\n", err.Error())
-			continue
-		}
-		rtt := time.Since(then)
 		if r.Id != m.Id {
 			fmt.Fprintf(os.Stderr, "Id mismatch\n")
-			continue
+			return
 		}
 
 		fmt.Printf("%v", r)
-		fmt.Printf("\n;; query time: %.3d µs, server: %s, size: %d bytes\n", rtt/1e3, nameserver, r.Len())
+		fmt.Printf("\n;; query time: %.3d µs, server: %s(%s), size: %d bytes\n", rtt/1e3, nameserver, c.Net, r.Len())
 	}
 }
