@@ -96,9 +96,9 @@ func main() {
 	}
 	defer co.Close()
 
-	for _, v := range qnames {
-		m.Question[0] = dns.Question{Name: dns.Fqdn(v), Qtype: dns.TypeA, Qclass: dns.ClassINET}
-		//m.Question[1] = dns.Question{Name: dns.Fqdn(v), Qtype: dns.TypeAAAA, Qclass: dns.ClassINET}
+	for _, n := range qnames {
+		m.Question[0] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeA, Qclass: dns.ClassINET}
+		//m.Question[1] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeAAAA, Qclass: dns.ClassINET}
 		m.Id = dns.Id()
 
 		co.SetReadDeadline(time.Now().Add(2 * time.Second))
@@ -106,12 +106,12 @@ func main() {
 
 		then := time.Now()
 		if err := co.WriteMsg(m); err != nil {
-			fmt.Fprintf(os.Stderr, ";; %s\n", err.Error())
+			fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
 			continue
 		}
 		r, err := co.ReadMsg()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, ";; %s\n", err.Error())
+			fmt.Fprintf(os.Stderr, ";; Reading response for %q failed: %s\n", n, err.Error())
 			continue
 		}
 		rtt := time.Since(then)
