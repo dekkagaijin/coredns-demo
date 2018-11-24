@@ -22,10 +22,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"time"
 
@@ -35,6 +33,9 @@ import (
 
 var (
 	hostnameFile = flag.String("hostname-file", "data/hostnames.txt", "The file from which to read hostnames to lookup via dns. The file should have exactly one hostname per line.")
+	statsFile    = flag.String("stats-file", "", "The file into which lookup statistics should be emitted.")
+	stressTest   = flag.Bool("stress-test", false, "endlessly query the input hostnames")
+	to           = flag.Int64("timeout", 5000, "i/o timeout in milliseconds")
 
 	ns   = flag.String("nameserver", "", "The nameserver to use, e.g. `8.8.8.8`")
 	port = flag.Int("port", 53, "port number to use")
@@ -48,21 +49,29 @@ func main() {
 	flag.Parse()
 
 	nameserver := *ns
+	timeout := time.Duration(*to) * time.Millisecond
 
 	qnames, err := data.ParseHostnameFile(*hostnameFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
-	fmt.Printf("num hosts: %d", len(qnames))
+
+	var stats *data.StatsFile
+	if *statsFile != "" {
+		stats, err = data.CreateStatsFile(*statsFile)
+		if err != nil {
+			log.Panic(err)
+		}
+		defer stats.Close()
+	}
 
 	if nameserver == "" {
 		conf, err := dns.ClientConfigFromFile("/etc/resolv.conf")
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 		nameserver = conf.Servers[0]
 	}
-	fmt.Println("nameserver: " + nameserver)
 
 	// /etc/resolv.conf adds [ and ], breaking net.ParseIP.
 	if nameserver[0] == '[' && nameserver[len(nameserver)-1] == ']' {
@@ -90,42 +99,53 @@ func main() {
 	m.Rcode = dns.RcodeSuccess
 
 	var co *dns.Conn
+	ran := false
 
-	for _, n := range qnames {
-		if co == nil {
-			co = new(dns.Conn)
-			if co.Conn, err = net.DialTimeout("tcp", nameserver, 2*time.Second); err != nil {
-				log.Fatal("Dialing " + nameserver + " failed: " + err.Error() + "\n")
+	for !ran || *stressTest {
+		ran = true
+		for _, n := range qnames {
+			m.Question[0] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeA, Qclass: dns.ClassINET}
+			m.Id = dns.Id()
+
+			then := time.Now() // Include the time spent on the TCP dial.
+			if co == nil {
+				co = new(dns.Conn)
+				if co.Conn, err = net.DialTimeout("tcp", nameserver, timeout); err != nil {
+					log.Panic("Dialing " + nameserver + " failed: " + err.Error() + "\n")
+				}
+				defer co.Close()
 			}
-			defer co.Close()
-		}
-		m.Question[0] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeA, Qclass: dns.ClassINET}
-		m.Id = dns.Id()
 
-		co.SetReadDeadline(time.Now().Add(2 * time.Second))
-		co.SetWriteDeadline(time.Now().Add(2 * time.Second))
+			deadline := then.Add(timeout)
+			co.SetReadDeadline(deadline)
+			co.SetWriteDeadline(deadline)
 
-		then := time.Now()
-		if err := co.WriteMsg(m); err != nil {
-			fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
-			co.Close()
-			co = nil
-			continue
-		}
-		r, err := co.ReadMsg()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, ";; Reading response for %q failed: %s\n", n, err.Error())
-			co.Close()
-			co = nil
-			continue
-		}
-		rtt := time.Since(then)
-		if r.Id != m.Id {
-			fmt.Fprintf(os.Stderr, "Id mismatch\n")
-			continue
-		}
+			if err := co.WriteMsg(m); err != nil {
+				if stats != nil {
+					stats.Emit(n, time.Since(then), err)
+				}
+				//fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
+				co.Close()
+				co = nil
+				continue
+			}
+			r, err := co.ReadMsg()
+			if err != nil {
+				if stats != nil {
+					stats.Emit(n, time.Since(then), err)
+				}
+				log.Printf(";; Reading response for %q failed: %s\n", n, err.Error())
+				co.Close()
+				co = nil
+				continue
+			}
+			rtt := time.Since(then)
 
-		fmt.Printf("%v", r)
-		fmt.Printf("\n;; query time: %.3d µs, server: %s, size: %d bytes\n", rtt/1e3, nameserver, r.Len())
+			log.Printf("%v", r)
+			log.Printf("\n;; query time: %.3d µs, server: %s, size: %d bytes\n", rtt/1e3, nameserver, r.Len())
+			if stats != nil {
+				stats.Emit(n, rtt, nil)
+			}
+		}
 	}
 }

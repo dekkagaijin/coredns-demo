@@ -22,11 +22,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
+	"time"
 
 	"github.com/dekkagaijin/coredns-demo/data"
 	"github.com/miekg/dns"
@@ -34,6 +33,9 @@ import (
 
 var (
 	hostnameFile = flag.String("hostname-file", "data/hostnames.txt", "The file from which to read hostnames to lookup via dns. The file should have exactly one hostname per line.")
+	statsFile    = flag.String("stats-file", "", "The file into which lookup statistics should be emitted.")
+	stressTest   = flag.Bool("stress-test", false, "endlessly query the input hostnames")
+	to           = flag.Int64("timeout", 5000, "i/o timeout in milliseconds")
 
 	ns   = flag.String("nameserver", "", "The nameserver to use, e.g. `8.8.8.8`")
 	port = flag.Int("port", 53, "port number to use")
@@ -50,18 +52,25 @@ func main() {
 
 	qnames, err := data.ParseHostnameFile(*hostnameFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
-	fmt.Printf("num hosts: %d", len(qnames))
+
+	var stats *data.StatsFile
+	if *statsFile != "" {
+		stats, err = data.CreateStatsFile(*statsFile)
+		if err != nil {
+			log.Panic(err)
+		}
+		defer stats.Close()
+	}
 
 	if nameserver == "" {
 		conf, err := dns.ClientConfigFromFile("/etc/resolv.conf")
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 		nameserver = conf.Servers[0]
 	}
-	fmt.Println("nameserver: " + nameserver)
 
 	// /etc/resolv.conf adds [ and ], breaking net.ParseIP.
 	if nameserver[0] == '[' && nameserver[len(nameserver)-1] == ']' {
@@ -74,6 +83,7 @@ func main() {
 	}
 
 	c := new(dns.Client)
+	c.Timeout = time.Duration(*to) * time.Millisecond
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
@@ -88,33 +98,40 @@ func main() {
 	m.Opcode = dns.StringToOpcode["QUERY"]
 	m.Rcode = dns.RcodeSuccess
 
-	for _, v := range qnames {
-		m.Question[0] = dns.Question{Name: dns.Fqdn(v), Qtype: dns.TypeA, Qclass: dns.ClassINET}
-		m.Id = dns.Id()
+	ran := false
 
-		fmt.Printf("%s", m.String())
-		fmt.Printf("\n;; size: %d bytes\n\n", m.Len())
+	for !ran || *stressTest {
+		ran = true
+		for _, n := range qnames {
+			m.Question[0] = dns.Question{Name: dns.Fqdn(n), Qtype: dns.TypeA, Qclass: dns.ClassINET}
+			m.Id = dns.Id()
 
-		c.Net = "udp"
-		r, rtt, err := c.Exchange(m, nameserver)
+			log.Printf("%s", m.String())
+			log.Printf("\n;; size: %d bytes\n\n", m.Len())
 
-		switch err {
-		case nil:
-			//do nothing
-		case dns.ErrTruncated:
-			fmt.Printf(";; Truncated, trying TCP\n")
-			c.Net = "tcp"
-			r, rtt, err = c.Exchange(m, nameserver)
-		default:
-			fmt.Printf(";; %s\n", err.Error())
-			continue
+			then := time.Now()
+
+			c.Net = "udp"
+			r, _, err := c.Exchange(m, nameserver)
+			switch err {
+			case nil:
+				//do nothing
+			case dns.ErrTruncated:
+				// Response was truncated, retry with TCP.
+				c.Net = "tcp"
+				r, _, err = c.Exchange(m, nameserver)
+			default:
+				if stats != nil {
+					stats.Emit(n, time.Since(then), err)
+				}
+				log.Printf(";; %s\n", err.Error())
+				continue
+			}
+
+			rtt := time.Since(then)
+
+			log.Printf("%v", r)
+			log.Printf("\n;; query time: %.3d µs, server: %s(%s), size: %d bytes\n", rtt/1e3, nameserver, c.Net, r.Len())
 		}
-		if r.Id != m.Id {
-			fmt.Fprintf(os.Stderr, "Id mismatch\n")
-			return
-		}
-
-		fmt.Printf("%v", r)
-		fmt.Printf("\n;; query time: %.3d µs, server: %s(%s), size: %d bytes\n", rtt/1e3, nameserver, c.Net, r.Len())
 	}
 }
