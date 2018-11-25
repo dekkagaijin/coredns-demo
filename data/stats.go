@@ -54,6 +54,9 @@ func CreateStatsFile(file string) (*StatsFile, error) {
 }
 
 func (s *StatsFile) Emit(hostname string, latency time.Duration, lookupErr error) error {
+	if s == nil {
+		return nil
+	}
 	errStr := noError
 	if lookupErr != nil {
 		// Per RFC 4180, strings containing double-quotes should themselves be double-quoted and each double-quote should be escaped with a second double-quote.
