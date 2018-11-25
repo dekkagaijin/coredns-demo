@@ -1,7 +1,7 @@
-# Proxy all requests to Google's public DNSs, using TCP
+# Forward all requests to Google's public DNSs, using TCP
 . {
-    proxy . 8.8.8.8:53 8.8.4.4:53 {
+    forward . 8.8.8.8:53 8.8.4.4:53 {
+        force_tcp
         policy sequential
-        protocol dns force_tcp
     }
 }

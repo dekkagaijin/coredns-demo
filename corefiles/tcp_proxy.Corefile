@@ -1,6 +1,6 @@
-# Proxy all requests to the nameservers defined in the host's resolv.conf, using TCP
+# Forward all requests to the nameservers defined in the host's resolv.conf, using TCP
 . {
-    proxy . /etc/resolv.conf {
-        protocol dns force_tcp
+    forward . /etc/resolv.conf {
+        force_tcp
     }
 }

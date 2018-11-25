@@ -1,6 +1,6 @@
-# Proxy all requests to Google's public DNSs
- {
-    proxy . 8.8.8.8:53 8.8.4.4:53 {
+# Forward all requests to Google's public DNSs
+. {
+    forward . 8.8.8.8:53 8.8.4.4:53 {
         policy sequential
     }
 }
