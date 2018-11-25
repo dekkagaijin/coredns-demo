@@ -1,0 +1,4 @@
+# Forward all requests to Cloudflare's public DNSs
+. {
+    forward . 1.1.1.1:53
+}
