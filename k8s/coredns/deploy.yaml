@@ -6,13 +6,10 @@ metadata:
   labels:
     app: coredns
 spec:
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
+  replicas: 1
   selector:
     matchLabels:
-      k8s-app: coredns
+      app: coredns
   template:
     metadata:
       labels:
