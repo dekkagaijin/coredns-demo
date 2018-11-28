@@ -15,6 +15,16 @@ spec:
       labels:
         app: coredns
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - txtdirect
+            topologyKey: kubernetes.io/hostname
       containers:
       - name: coredns
         image: k8s.gcr.io/coredns:1.2.6

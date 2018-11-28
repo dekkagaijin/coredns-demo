@@ -40,7 +40,7 @@ items:
           prometheus.io/scrape: 'true'
       spec:
         # Needed when using unmodified rbac-setup.yml
-        serviceAccountName: prometheus
+        #serviceAccountName: prometheus
         containers:
         - name: prometheus
           image: gcr.io/stackdriver-prometheus/stackdriver-prometheus:release-0.4.4
