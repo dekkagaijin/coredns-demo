@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Caddyfile: |
+    # TXTDirect -> CoreDNS k8s
+    :8001 {
+      tls off
+      txtdirect {
+        enable host
+        resolver -DNSIP-:53
+      }
+      prometheus
+      log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
+      errors
+    }
+    # TXTDirect -> CoreDNS local
+    :8002 {
+      tls off
+      txtdirect {
+        enable host
+        resolver localhost:53
+      }
+      prometheus
+      log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
+      errors
+    }
+    # TXTDirect -> slowdown
+    :8003 {
+      tls off
+      txtdirect {
+        enable host
+        resolver localhost:54
+      }
+      prometheus
+      log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
+      errors
+    }
+    :80/healthz {
+      tls off
+      status 200 /
+    }
+    :80/probez {
+      tls off
+      status 200 /
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect-k8s
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP- {
+          protocol dns
+        }
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect-ds
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP-ds- {
+          protocol dns
+        }
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect-node
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . /etc/resolv.conf
+      }

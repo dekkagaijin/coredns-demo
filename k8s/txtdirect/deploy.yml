@@ -1,0 +1,114 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: txtdirect
+  namespace: kubecon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: txtdirect
+  template:
+    metadata:
+      labels:
+        app: txtdirect
+        deploy: "35"
+    spec:
+      containers:
+      - name: txtdirect
+        image: c.txtdirect.org/txtdirect:dev-3fd9be
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        command: [ "/caddy", "--agree", "--email=cert@okkur.io", "--conf=/etc/txtdirect/Caddyfile", "--log=stderr" ]
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+            httpHeaders:
+              - name: X-Probez
+                value: liveness.k8s
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+            httpHeaders:
+              - name: X-Probez
+                value: liveness.k8s
+          initialDelaySeconds: 90
+        volumeMounts:
+        - name: config
+          mountPath: /etc/txtdirect
+          readOnly: true
+        - name: data
+          mountPath: /root/.caddy
+        ports:
+          - name: http
+            containerPort: 80
+          - name: https
+            containerPort: 443
+          - name: metrics
+            containerPort: 9180
+      - name: coredns
+        image: k8s.gcr.io/coredns:1.2.6
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        command: [ "/coredns", "--conf=/etc/coredns/Corefile" ]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            httpHeaders:
+              - name: X-Probez
+                value: liveness.k8s
+          initialDelaySeconds: 90
+        volumeMounts:
+        - name: config-coredns
+          mountPath: /etc/coredns
+          readOnly: true
+        ports:
+          - name: dns
+            containerPort: 53
+          - name: metrics
+            containerPort: 9153
+      - name: slowdown
+        image: gcr.io/google-containers/pause-amd64:3.1
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        command: [ "sleep 999999" ]
+        ports:
+          - name: dns
+            containerPort: 53
+      volumes:
+      - name: txtdirect-coredns
+        configMap:
+          name: coredns
+          items:
+          - key: Corefile
+            path: Corefile
+      - name: config
+        configMap:
+          name: txtdirect
+          items:
+          - key: Caddyfile
+            path: Caddyfile
+      - name: data
+        emptyDir: {}

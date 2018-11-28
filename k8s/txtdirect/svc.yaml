@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: txtdirect
+  namespace: kubecon
+  annotations:
+    prometheus.io/port: "9180"
+    prometheus.io/scrape: "true"
+  labels:
+    app: txtdirect
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    name: txtdirect
+  selector:
+    app: txtdirect
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-sidecar
+  namespace: kubecon
+  annotations:
+    prometheus.io/port: "9153"
+    prometheus.io/scrape: "true"
+  labels:
+    app: txtdirect
+spec:
+  selector:
+    app: txtdirect
