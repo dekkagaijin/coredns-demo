@@ -62,9 +62,7 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
-          protocol dns
-        }
+        forward . -DNSIP-
       }
 ---
 apiVersion: v1
@@ -80,9 +78,7 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP-ds- {
-          protocol dns
-        }
+        forward . -DNSIP-ds-
       }
 ---
 apiVersion: v1
@@ -98,5 +94,5 @@ data:
         errors
         health
         prometheus :9153
-        proxy . /etc/resolv.conf
+        forward . /etc/resolv.conf
       }

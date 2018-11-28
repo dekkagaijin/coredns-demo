@@ -11,9 +11,7 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
-          protocol dns
-        }
+        foward . -DNSIP-
       }
 ---
 apiVersion: v1
@@ -29,8 +27,8 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
-          protocol dns force_tcp
+        forward . -DNSIP- {
+          force_tcp
         }
       }
 ---
@@ -47,8 +45,8 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
-          protocol dns force_tcp
+        forward . -DNSIP- {
+          force_tcp
         }
         cache 30
       }
