@@ -44,7 +44,8 @@ spec:
           initialDelaySeconds: 90
         volumeMounts:
         - name: config
-          mountPath: /config
+          mountPath: /etc/txtdirect
+          readOnly: true
         - name: data
           mountPath: /root/.caddy
         ports:
@@ -75,7 +76,8 @@ spec:
           initialDelaySeconds: 90
         volumeMounts:
         - name: config-coredns
-          mountPath: /etc/coredns/Corefile
+          mountPath: /etc/coredns
+          readOnly: true
         ports:
           - name: dns
             containerPort: 53
@@ -96,11 +98,17 @@ spec:
           - name: dns
             containerPort: 53
       volumes:
-      - name: config-coredns
+      - name: txtdirect-coredns
         configMap:
-          name: txtdirect-no-cache-tcp-k8s
+          name: coredns
+          items:
+          - key: Corefile
+            path: Corefile
       - name: config
         configMap:
           name: txtdirect
+          items:
+          - key: Caddyfile
+            path: Caddyfile
       - name: data
         emptyDir: {}

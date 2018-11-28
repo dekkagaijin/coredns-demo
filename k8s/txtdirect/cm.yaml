@@ -6,7 +6,7 @@ metadata:
   labels:
     app: txtdirect
 data:
-  caddyfile: |
+  Caddyfile: |
     # TXTDirect -> CoreDNS k8s
     :8001 {
       tls off
@@ -52,12 +52,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-no-cache-tcp-k8s
+  name: txtdirect-k8s
   namespace: kubecon
   labels:
-    project: txtdirect.io
-    subproject: redirect
-    component: appserver
     app: txtdirect
 data:
   Corefile: |
@@ -66,19 +63,16 @@ data:
         health
         prometheus :9153
         proxy . -DNSIP- {
-          protocol dns force_tcp
+          protocol dns
         }
       }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-cache-tcp-k8s
+  name: txtdirect-ds
   namespace: kubecon
   labels:
-    project: txtdirect.io
-    subproject: redirect
-    component: appserver
     app: txtdirect
 data:
   Corefile: |
@@ -86,61 +80,17 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
-          protocol dns force_tcp
-        }
-        cache 30
-      }
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: txtdirect-cache-grpc-local
-  namespace: kubecon
-  labels:
-    project: txtdirect.io
-    subproject: redirect
-    component: appserver
-    app: txtdirect
-data:
-  Corefile: |
-    .:53 {
-        errors
-        health
-        prometheus :9153
-        proxy . -DNSIP- {
-          protocol grpc insecure
+        proxy . -DNSIP-ds- {
+          protocol dns
         }
       }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-no-cache-tcp-local
+  name: txtdirect-node
   namespace: kubecon
   labels:
-    project: txtdirect.io
-    subproject: redirect
-    component: appserver
-    app: txtdirect
-data:
-  Corefile: |
-    .:53 {
-        errors
-        health
-        prometheus :9153
-        proxy . /etc/resolv.conf
-      }
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: txtdirect-cache-tcp-local
-  namespace: kubecon
-  labels:
-    project: txtdirect.io
-    subproject: redirect
-    component: appserver
     app: txtdirect
 data:
   Corefile: |

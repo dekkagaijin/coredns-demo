@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-no-cache-udp-k8s
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP- {
+          protocol dns
+        }
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-no-cache-tcp-k8s
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP- {
+          protocol dns force_tcp
+        }
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-cache-tcp-k8s
+  namespace: kubecon
+  labels:
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP- {
+          protocol dns force_tcp
+        }
+        cache 30
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect-no-cache-grpc
+  namespace: kubecon
+  labels:
+    project: txtdirect.io
+    subproject: redirect
+    component: appserver
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP-DS- {
+          protocol grpc insecure
+        }
+      }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: txtdirect-cache-grpc-k8s
+  namespace: kubecon
+  labels:
+    project: txtdirect.io
+    subproject: redirect
+    component: appserver
+    app: txtdirect
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        prometheus :9153
+        proxy . -DNSIP- {
+          protocol grpc insecure
+        }
+        cache 30
+      }
