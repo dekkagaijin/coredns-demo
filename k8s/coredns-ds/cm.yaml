@@ -11,7 +11,7 @@ data:
         errors
         health
         prometheus :9153
-        foward . -DNSIP-
+        foward . 10.55.240.23
       }
 ---
 apiVersion: v1
@@ -27,7 +27,7 @@ data:
         errors
         health
         prometheus :9153
-        forward . -DNSIP- {
+        forward . 10.55.240.23{
           force_tcp
         }
       }
@@ -45,7 +45,7 @@ data:
         errors
         health
         prometheus :9153
-        forward . -DNSIP- {
+        forward . 10.55.240.23 {
           force_tcp
         }
         cache 30
@@ -54,7 +54,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-no-cache-grpc
+  name: txtdirect-no-cache-grpc-k8s
   namespace: kubecon
   labels:
     project: txtdirect.io
@@ -67,7 +67,7 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP-DS- {
+        proxy . 10.55.240.23 {
           protocol grpc insecure
         }
       }
@@ -88,7 +88,7 @@ data:
         errors
         health
         prometheus :9153
-        proxy . -DNSIP- {
+        proxy . 10.55.240.23 {
           protocol grpc insecure
         }
         cache 30

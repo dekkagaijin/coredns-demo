@@ -11,7 +11,7 @@ metadata:
 spec:
   selector:
     app: coredns-ds
-  ClusterIP: -DNSIP-local-
+  clusterIP: 10.55.240.42
   ports:
   - name: dns
     port: 53

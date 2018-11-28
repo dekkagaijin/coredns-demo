@@ -6,7 +6,6 @@ metadata:
   labels:
     app: coredns-ds
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: coredns-ds
