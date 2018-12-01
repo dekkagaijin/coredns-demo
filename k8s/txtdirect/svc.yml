@@ -10,7 +10,7 @@ metadata:
     app: txtdirect
 spec:
   ports:
-  - port: 80
+  - port: 8080
     protocol: TCP
     name: txtdirect
   selector:
@@ -29,3 +29,7 @@ metadata:
 spec:
   selector:
     app: txtdirect
+  ports:
+  - name: portport
+    port: 9999
+    protocol: TCP

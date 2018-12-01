@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app: coredns-ds
+        deploy: "103"
     spec:
       containers:
       - name: coredns

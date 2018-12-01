@@ -12,11 +12,11 @@ spec:
     metadata:
       labels:
         app: txtdirect
-        deploy: "35"
+        deploy: "38"
     spec:
       containers:
       - name: txtdirect
-        image: c.txtdirect.org/txtdirect:dev-3fd9be
+        image: c.txtdirect.org/txtdirect:dev-cd6330
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -49,12 +49,13 @@ spec:
         - name: data
           mountPath: /root/.caddy
         ports:
-          - name: http
+          - name: health
             containerPort: 80
-          - name: https
-            containerPort: 443
+          - name: http
+            containerPort: 8080
           - name: metrics
             containerPort: 9180
+            protocol: TCP
       - name: coredns
         image: k8s.gcr.io/coredns:1.2.6
         securityContext:
@@ -69,7 +70,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8080
+            port: 8081
             httpHeaders:
               - name: X-Probez
                 value: liveness.k8s
@@ -79,10 +80,9 @@ spec:
           mountPath: /etc/coredns
           readOnly: true
         ports:
-          - name: dns
-            containerPort: 53
           - name: metrics
             containerPort: 9153
+            protocol: TCP
       - name: slowdown
         image: gcr.io/google-containers/pause-amd64:3.1
         securityContext:
@@ -93,14 +93,10 @@ spec:
             drop:
             - all
           readOnlyRootFilesystem: true
-        command: [ "sleep 999999" ]
-        ports:
-          - name: dns
-            containerPort: 53
       volumes:
-      - name: txtdirect-coredns
+      - name: config-coredns
         configMap:
-          name: coredns
+          name: coredns-k8s
           items:
           - key: Corefile
             path: Corefile

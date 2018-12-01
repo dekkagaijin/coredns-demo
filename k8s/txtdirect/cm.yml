@@ -7,34 +7,12 @@ metadata:
     app: txtdirect
 data:
   Caddyfile: |
-    # TXTDirect -> CoreDNS k8s
-    :8001 {
-      tls off
-      txtdirect {
-        enable host
-        resolver -DNSIP-:53
-      }
-      prometheus
-      log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
-      errors
-    }
-    # TXTDirect -> CoreDNS local
-    :8002 {
+    # TXTDirect -> CoreDNS gateway
+    :8080 {
       tls off
       txtdirect {
         enable host
         resolver localhost:53
-      }
-      prometheus
-      log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
-      errors
-    }
-    # TXTDirect -> slowdown
-    :8003 {
-      tls off
-      txtdirect {
-        enable host
-        resolver localhost:54
       }
       prometheus
       log / stdout "{remote} - [{when_iso}] \"{method} {uri} {proto}\" {status} {size} {latency}"
@@ -52,47 +30,51 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-k8s
+  name: coredns-k8s
   namespace: kubecon
   labels:
     app: txtdirect
 data:
   Corefile: |
     .:53 {
-        errors
-        health
-        prometheus :9153
-        forward . -DNSIP-
-      }
+      log
+      errors
+      health :8081
+      prometheus :9153
+      forward . 10.55.240.23
+    }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-ds
+  name: coredns-ds
   namespace: kubecon
   labels:
     app: txtdirect
 data:
   Corefile: |
     .:53 {
-        errors
-        health
-        prometheus :9153
-        forward . -DNSIP-ds-
-      }
+      log
+      errors
+      health :8081
+      prometheus :9153
+      # forward IP from DS needs to be manually set to the DS running on the same node!
+      forward . 10.52.1.6
+    }
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-node
+  name: coredns-node
   namespace: kubecon
   labels:
     app: txtdirect
 data:
   Corefile: |
     .:53 {
-        errors
-        health
-        prometheus :9153
-        forward . /etc/resolv.conf
-      }
+      log
+      errors
+      health :8081
+      prometheus :9153
+      forward . /etc/resolv.conf
+    }
