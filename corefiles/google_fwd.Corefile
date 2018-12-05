@@ -1,6 +1,4 @@
-# Forward all requests to Google's public DNSs
+# Forward all requests to Google's public DNS
 . {
-    forward . 8.8.8.8:53 8.8.4.4:53 {
-        policy sequential
-    }
+    forward . 8.8.8.8:53
 }
