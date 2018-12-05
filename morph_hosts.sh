@@ -29,6 +29,6 @@ echo "$head" > data/critical.software
 while read line; do
   line_morphed="${line//./-}"
   echo "$line_morphed     86400 IN CNAME     txtd.io." >> data/critical.software
-  echo "_redirect.$line_morphed     42000 IN TXT     \"v=txtv0;type=host;to=https://www.google.com/search?btnI=1&q=$line\"" >> data/critical.software
+  echo "_redirect.$line_morphed     42000 IN TXT     \"v=txtv0;type=host;to=https://about.txtdirect.org\"" >> data/critical.software
 done <data/hostnames.txt
 
