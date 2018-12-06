@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# This uses `tc` rules to intercept and mess with traffic sent to a specific IP on a specific network interface.
+# e.g. BORK_INTERFACE=eth1  DROP_PCT=0.5 ./network_gremlin.sh
+
 # See `ifconfig -a` or `ip link show` for a list of network interfaces
 BORK_INTERFACE="${BORK_INTERFACE:-eth0}"
 
 BORK_IP="${BORK_IP:-8.8.8.8}"
-DELAY="${DELAY:-5ms}"
+DELAY="${DELAY:-10ms}"
 DROP_PCT="${DROP_PCT:-1}"
 CORRELATION_PCT="${CORRELATION_PCT:-0}"
 

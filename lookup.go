@@ -119,7 +119,7 @@ func main() {
 	for !ran || *stressTest {
 		ran = true
 		for i, n := range qnames {
-			log.Printf("(%d/%d) looking up %q: \n", i, numHostnames, n)
+			log.Printf("(%d/%d) looking up %q: \n", i+1, numHostnames, n)
 			var err error
 			start := time.Now()
 			if *forceTcp {
