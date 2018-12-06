@@ -30,7 +30,7 @@ import (
 
 const (
 	crlf    = "\r\n" // CSV line breaks per https://tools.ietf.org/html/rfc4180
-	header  = "hostname,latency_micros,lookup_error" + crlf
+	header  = "hostname,latency_nanos,lookup_error" + crlf
 	noError = "nil"
 )
 
