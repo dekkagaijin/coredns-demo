@@ -36,12 +36,14 @@ var (
 	statsFile    = flag.String("stats-file", "", "The file into which lookup statistics should be emitted.")
 	stressTest   = flag.Bool("stress-test", false, "endlessly query the input hostnames")
 	forceTcp     = flag.Bool("force-tcp", false, "always use TCP to query the nameserver, reusing the connection")
+	reuseTcp     = flag.Bool("reuse-tcp", true, "when in force-tcp mode, reuse an existing TCP connection, if possible")
 	to           = flag.Int64("timeout", 5000, "the i/o timeout in milliseconds")
+	numRetries   = flag.Int("num-retries", 2, "the number of times to retry each request")
 
 	ns   = flag.String("nameserver", "", "The nameserver to use, e.g. `8.8.8.8`")
 	port = flag.Int("port", 53, "port number to use")
 	aa   = flag.Bool("aa", false, "set AA (Authoritative) flag in query")
-	ad   = flag.Bool("ad", false, "set AD (AuthenticatedData) flag in query")
+	ad   = flag.Bool("ad", false, "set AD (AustartticatedData) flag in query")
 	cd   = flag.Bool("cd", false, "set CD (CheckingDisabled) flag in query")
 	rd   = flag.Bool("rd", true, "set RD (RecursionDesired) flag in query")
 )
@@ -112,82 +114,98 @@ func main() {
 		c = new(dns.Client)
 		c.Timeout = timeout
 	}
+	numHostnames := len(qnames)
 
 	for !ran || *stressTest {
 		ran = true
-		for _, n := range qnames {
+		for i, n := range qnames {
+			log.Printf("(%d/%d) looking up %q: \n", i+1, numHostnames, n)
+			var err error
+			start := time.Now()
 			if *forceTcp {
-				tcpLookup(nameserver, n, &co, m, stats, timeout)
+				err = tcpLookup(nameserver, n, &co, m, stats, timeout)
+			} else {
+				err = standardLookup(nameserver, n, c, m, stats)
+			}
+			rtt := time.Since(start)
+			stats.Emit(n, rtt, err)
+			log.Printf(";; %q query time: %.3d ns, server: %s\n", n, rtt, nameserver)
+		}
+	}
+}
+
+func tcpLookup(nameserver, hostname string, sharedConn **dns.Conn, m *dns.Msg, stats *data.StatsFile, timeout time.Duration) error {
+	m.Question[0].Name = dns.Fqdn(hostname)
+	m.Id = dns.Id()
+	attempts := 1 + *numRetries
+
+	if *sharedConn != nil && !*reuseTcp {
+		(*sharedConn).Close()
+		*sharedConn = nil
+	}
+
+	var err error
+
+	for attempts > 0 {
+		attempts--
+
+		start := time.Now()
+		co := *sharedConn
+		if co == nil {
+			co = new(dns.Conn)
+			tcpConn, err := net.DialTimeout("tcp", nameserver, timeout)
+			if err != nil {
 				continue
 			}
-			standardLookup(nameserver, n, c, m, stats)
+			co.Conn = tcpConn
+			*sharedConn = co
 		}
-	}
-}
 
-func tcpLookup(nameserver, hostname string, sharedConn **dns.Conn, m *dns.Msg, stats *data.StatsFile, timeout time.Duration) {
-	m.Question[0].Name = dns.Fqdn(hostname)
-	m.Id = dns.Id()
+		deadline := start.Add(timeout)
+		co.SetReadDeadline(deadline)
+		co.SetWriteDeadline(deadline)
 
-	then := time.Now() // Include the time spent on the TCP dial.
-	co := *sharedConn
-	if co == nil {
-		co = new(dns.Conn)
-		tcpConn, err := net.DialTimeout("tcp", nameserver, timeout)
+		if err = co.WriteMsg(m); err != nil {
+			co.Close()
+			*sharedConn = nil
+			continue
+		}
+		_, err := co.ReadMsg()
 		if err != nil {
-			log.Panic("Dialing " + nameserver + " failed: " + err.Error() + "\n")
+			co.Close()
+			*sharedConn = nil
+			continue
 		}
-		co.Conn = tcpConn
-		*sharedConn = co
+		return nil
 	}
 
-	deadline := then.Add(timeout)
-	co.SetReadDeadline(deadline)
-	co.SetWriteDeadline(deadline)
-
-	if err := co.WriteMsg(m); err != nil {
-		stats.Emit(hostname, time.Since(then), err)
-		//fmt.Fprintf(os.Stderr, ";; Lookup for %q failed: %s\n", n, err.Error())
-		co.Close()
-		*sharedConn = nil
-		return
-	}
-	r, err := co.ReadMsg()
-	if err != nil {
-		stats.Emit(hostname, time.Since(then), err)
-		log.Printf(";; Reading response for %q failed: %s\n", hostname, err.Error())
-		co.Close()
-		*sharedConn = nil
-		return
-	}
-	rtt := time.Since(then)
-
-	log.Printf(";; %q query time: %.3d µs, server: %s, size: %d bytes\n", hostname, rtt/1e3, nameserver, r.Len())
-	stats.Emit(hostname, rtt, nil)
+	return err
 }
 
-func standardLookup(nameserver, hostname string, c *dns.Client, m *dns.Msg, stats *data.StatsFile) {
+func standardLookup(nameserver, hostname string, c *dns.Client, m *dns.Msg, stats *data.StatsFile) error {
 	m.Question[0].Name = dns.Fqdn(hostname)
 	m.Id = dns.Id()
-
-	then := time.Now()
 
 	c.Net = "udp"
-	r, _, err := c.Exchange(m, nameserver)
-	switch err {
-	case nil:
-		//do nothing
-	case dns.ErrTruncated:
-		// Response was truncated, retry with TCP.
-		c.Net = "tcp"
-		r, _, err = c.Exchange(m, nameserver)
-	default:
-		stats.Emit(hostname, time.Since(then), err)
-		log.Printf(";; %s\n", err.Error())
-		return
-	}
+	attempts := 1 + *numRetries
 
-	rtt := time.Since(then)
-	log.Printf(";; %q query time: %.3d µs, server: %s(%s), size: %d bytes\n", hostname, rtt/1e3, nameserver, c.Net, r.Len())
-	stats.Emit(hostname, rtt, nil)
+	var err error
+
+	for attempts > 0 {
+		attempts--
+		r, _, err := c.Exchange(m, nameserver)
+		if err != nil {
+			continue
+		}
+		if r.Truncated {
+			// Response was truncated, retry with TCP.
+			c.Net = "tcp"
+			r, _, err = c.Exchange(m, nameserver)
+			if err != nil {
+				continue
+			}
+		}
+		return nil
+	}
+	return err
 }
