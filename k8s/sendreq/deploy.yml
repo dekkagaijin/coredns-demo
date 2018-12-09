@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sendreq
+  namespace: kubecon-undeployed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sendreq
+  template:
+    metadata:
+      labels:
+        app: sendreq
+        deploy: "28"
+    spec:
+      containers:
+      - name: sendreq
+        image: gcr.io/kubecon-223920/sendreq:dev-d4e84f
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        command: [ "sh", "-c", "while sleep 3600; do :; done" ]

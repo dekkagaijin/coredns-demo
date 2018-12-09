@@ -12,11 +12,12 @@ spec:
     metadata:
       labels:
         app: txtdirect
-        deploy: "38"
+        deploy: "41"
     spec:
       containers:
       - name: txtdirect
-        image: c.txtdirect.org/txtdirect:dev-cd6330
+        imagePullPolicy: Always
+        image: c.txtdirect.org/txtdirect:dev-k8sc72
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sendreq
+  namespace: kubecon
+spec:
+  completions: 10
+  parallelism: 5
+  template:
+    spec:
+      containers:
+      - name: sendreq
+        imagePullPolicy: Always
+        image: gcr.io/kubecon-223920/sendreq:dev-d4e84f
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - all
+          readOnlyRootFilesystem: true
+        command: [ "sh", "-c", "./sendreq --hosts hosts.txt --endpoint http://10.55.246.158:8080 --parallel=false --iteration 1" ]
+      restartPolicy: Never

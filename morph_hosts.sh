@@ -32,3 +32,10 @@ while read line; do
   echo "_redirect.$line_morphed     42000 IN TXT     \"v=txtv0;type=host;to=https://about.txtdirect.org\"" >> data/critical.software
 done <data/hostnames.txt
 
+
+echo "" > data/hosts.txt
+
+while read line; do
+  line_morphed="${line//./-}"
+  echo "$line_morphed.kubecon.critical.software" >> data/hosts.txt
+done <data/hostnames.txt

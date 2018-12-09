@@ -6,11 +6,10 @@ metadata:
 data:
   Corefile: |
     .:53 {
-      log
       errors
       health
       prometheus :9153
-      proxy . /etc/resolv.conf
+      proxy . 8.8.8.8
       cache 30
        loadbalance
     }
