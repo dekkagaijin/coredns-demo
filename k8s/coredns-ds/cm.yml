@@ -77,7 +77,8 @@ data:
       }
       cache 30
     }
----apiVersion: v1
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ds-no-cache-tcp-8
