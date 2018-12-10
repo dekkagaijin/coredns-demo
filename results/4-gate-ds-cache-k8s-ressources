@@ -1,0 +1,4 @@
+cpu max node: 4 vcpus
+cpu max coredns: 3.5 vcpus
+memory max: 18mb
+time: 7.2min

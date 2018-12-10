@@ -1,0 +1,229 @@
+Connecting to 10.52.7.211:9153 (10.52.7.211:9153)
+# HELP coredns_build_info A metric with a constant '1' value labeled by version, revision, and goversion from which CoreDNS was built.
+# TYPE coredns_build_info gauge
+coredns_build_info{goversion="go1.11.2",revision="756749c",version="1.2.6"} 1
+# HELP coredns_dns_request_count_total Counter of DNS requests made per zone, protocol and family.
+# TYPE coredns_dns_request_count_total counter
+coredns_dns_request_count_total{family="1",proto="udp",server="dns://:53",zone="."} 1.000204e+06
+# HELP coredns_dns_request_duration_seconds Histogram of the time (in seconds) each request took.
+# TYPE coredns_dns_request_duration_seconds histogram
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.00025"} 190765
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.0005"} 887646
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.001"} 956662
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.002"} 971715
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.004"} 976409
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.008"} 978784
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.016"} 996773
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.032"} 997269
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.064"} 997277
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.128"} 1.000202e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.256"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="0.512"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="1.024"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="2.048"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="4.096"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="8.192"} 1.000204e+06
+coredns_dns_request_duration_seconds_bucket{server="dns://:53",zone=".",le="+Inf"} 1.000204e+06
+coredns_dns_request_duration_seconds_sum{server="dns://:53",zone="."} 808.1374181220065
+coredns_dns_request_duration_seconds_count{server="dns://:53",zone="."} 1.000204e+06
+# HELP coredns_dns_request_size_bytes Size of the EDNS0 UDP buffer in bytes (64K for TCP).
+# TYPE coredns_dns_request_size_bytes histogram
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="100"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="200"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="300"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="400"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="511"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="1023"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="2047"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="4095"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="8291"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="16000"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="32000"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="48000"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="64000"} 1.000204e+06
+coredns_dns_request_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="+Inf"} 1.000204e+06
+coredns_dns_request_size_bytes_sum{proto="udp",server="dns://:53",zone="."} 6.7532519e+07
+coredns_dns_request_size_bytes_count{proto="udp",server="dns://:53",zone="."} 1.000204e+06
+# HELP coredns_dns_request_type_count_total Counter of DNS requests per type, per zone.
+# TYPE coredns_dns_request_type_count_total counter
+coredns_dns_request_type_count_total{server="dns://:53",type="NS",zone="."} 3
+coredns_dns_request_type_count_total{server="dns://:53",type="TXT",zone="."} 1.000201e+06
+# HELP coredns_dns_response_rcode_count_total Counter of response status codes.
+# TYPE coredns_dns_response_rcode_count_total counter
+coredns_dns_response_rcode_count_total{rcode="NOERROR",server="dns://:53",zone="."} 1.000004e+06
+coredns_dns_response_rcode_count_total{rcode="NXDOMAIN",server="dns://:53",zone="."} 200
+# HELP coredns_dns_response_size_bytes Size of the returned response in bytes.
+# TYPE coredns_dns_response_size_bytes histogram
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="0"} 0
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="100"} 0
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="200"} 991566
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="300"} 1.000201e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="400"} 1.000201e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="511"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="1023"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="2047"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="4095"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="8291"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="16000"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="32000"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="48000"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="64000"} 1.000204e+06
+coredns_dns_response_size_bytes_bucket{proto="udp",server="dns://:53",zone=".",le="+Inf"} 1.000204e+06
+coredns_dns_response_size_bytes_sum{proto="udp",server="dns://:53",zone="."} 1.74572783e+08
+coredns_dns_response_size_bytes_count{proto="udp",server="dns://:53",zone="."} 1.000204e+06
+# HELP coredns_forward_request_count_total Counter of requests made per upstream.
+# TYPE coredns_forward_request_count_total counter
+coredns_forward_request_count_total{to="10.55.240.23:53"} 1.000204e+06
+# HELP coredns_forward_request_duration_seconds Histogram of the time each request took.
+# TYPE coredns_forward_request_duration_seconds histogram
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.00025"} 488522
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.0005"} 910832
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.001"} 959312
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.002"} 972278
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.004"} 976541
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.008"} 978822
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.016"} 996782
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.032"} 997270
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.064"} 997278
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.128"} 1.000203e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.256"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="0.512"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="1.024"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="2.048"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="4.096"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="8.192"} 1.000204e+06
+coredns_forward_request_duration_seconds_bucket{to="10.55.240.23:53",le="+Inf"} 1.000204e+06
+coredns_forward_request_duration_seconds_sum{to="10.55.240.23:53"} 758.4517330769851
+coredns_forward_request_duration_seconds_count{to="10.55.240.23:53"} 1.000204e+06
+# HELP coredns_forward_response_rcode_count_total Counter of requests made per upstream.
+# TYPE coredns_forward_response_rcode_count_total counter
+coredns_forward_response_rcode_count_total{rcode="NOERROR",to="10.55.240.23:53"} 1.000004e+06
+coredns_forward_response_rcode_count_total{rcode="NXDOMAIN",to="10.55.240.23:53"} 200
+# HELP coredns_forward_sockets_open Gauge of open sockets per upstream.
+# TYPE coredns_forward_sockets_open gauge
+coredns_forward_sockets_open{to="10.55.240.23:53"} 2
+# HELP coredns_health_request_duration_seconds Histogram of the time (in seconds) each request took.
+# TYPE coredns_health_request_duration_seconds histogram
+coredns_health_request_duration_seconds_bucket{le="0.00025"} 0
+coredns_health_request_duration_seconds_bucket{le="0.0005"} 68
+coredns_health_request_duration_seconds_bucket{le="0.001"} 1283
+coredns_health_request_duration_seconds_bucket{le="0.002"} 1329
+coredns_health_request_duration_seconds_bucket{le="0.004"} 1348
+coredns_health_request_duration_seconds_bucket{le="0.008"} 1354
+coredns_health_request_duration_seconds_bucket{le="0.016"} 1355
+coredns_health_request_duration_seconds_bucket{le="0.032"} 1355
+coredns_health_request_duration_seconds_bucket{le="0.064"} 1355
+coredns_health_request_duration_seconds_bucket{le="0.128"} 1355
+coredns_health_request_duration_seconds_bucket{le="0.256"} 1355
+coredns_health_request_duration_seconds_bucket{le="0.512"} 1355
+coredns_health_request_duration_seconds_bucket{le="1.024"} 1355
+coredns_health_request_duration_seconds_bucket{le="2.048"} 1355
+coredns_health_request_duration_seconds_bucket{le="4.096"} 1355
+coredns_health_request_duration_seconds_bucket{le="8.192"} 1355
+coredns_health_request_duration_seconds_bucket{le="+Inf"} 1355
+coredns_health_request_duration_seconds_sum 0.9455119450000001
+coredns_health_request_duration_seconds_count 1355
+# HELP coredns_panic_count_total A metrics that counts the number of panics.
+# TYPE coredns_panic_count_total counter
+coredns_panic_count_total 0
+# HELP go_gc_duration_seconds A summary of the GC invocation durations.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 4.9945e-05
+go_gc_duration_seconds{quantile="0.25"} 0.000111874
+go_gc_duration_seconds{quantile="0.5"} 0.000166988
+go_gc_duration_seconds{quantile="0.75"} 0.000254326
+go_gc_duration_seconds{quantile="1"} 0.009872337
+go_gc_duration_seconds_sum 0.416888362
+go_gc_duration_seconds_count 1375
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 27
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 3.002824e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.732981376e+09
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.480399e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 4.5579896e+07
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 2.379776e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 3.002824e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 6.1046784e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 4.980736e+06
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 17259
+# HELP go_memstats_heap_released_bytes_total Total number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes_total counter
+go_memstats_heap_released_bytes_total 5.9211776e+07
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 6.602752e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.5444199500385783e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 4.5597155e+07
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 6912
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 16384
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 81776
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 114688
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 5.018416e+06
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.184297e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.081344e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.081344e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained by system. Sum of all system allocations.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 7.2284408e+07
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 257.01
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 11
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 3.0695424e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.54441861664e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.45915904e+08
+-                    100% |*******************************| 15952   0:00:00 ETA
