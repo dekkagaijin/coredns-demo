@@ -12,11 +12,10 @@ spec:
     metadata:
       labels:
         app: txtdirect
-        deploy: "41"
+        deploy: "79"
     spec:
       containers:
       - name: txtdirect
-        imagePullPolicy: Always
         image: c.txtdirect.org/txtdirect:dev-k8sc72
         securityContext:
           allowPrivilegeEscalation: false
@@ -97,7 +96,7 @@ spec:
       volumes:
       - name: config-coredns
         configMap:
-          name: coredns-k8s
+          name: coredns-ds
           items:
           - key: Corefile
             path: Corefile

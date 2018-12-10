@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: coredns
-        deploy: "75"
+        deploy: "79"
     spec:
       affinity:
         podAntiAffinity:

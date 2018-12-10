@@ -12,7 +12,7 @@ data:
       tls off
       txtdirect {
         enable host
-        resolver localhost:53
+        resolver 127.0.0.1:53
       }
       prometheus
       errors
@@ -56,5 +56,5 @@ data:
       health :8081
       prometheus :9153
       # forward IP from DS needs to be manually set to the DS running on the same node!
-      forward . 10.52.1.28
+      forward . 10.52.7.216
     }

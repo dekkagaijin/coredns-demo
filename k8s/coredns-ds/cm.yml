@@ -38,7 +38,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-no-cache-grpc-k8s
+  name: ds-no-cache-grpc-k8s
   namespace: kubecon
   labels:
     project: txtdirect.io
@@ -59,7 +59,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: txtdirect-cache-grpc-k8s
+  name: ds-cache-grpc-k8s
   namespace: kubecon
   labels:
     project: txtdirect.io

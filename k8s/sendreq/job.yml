@@ -4,14 +4,13 @@ metadata:
   name: sendreq
   namespace: kubecon
 spec:
-  completions: 10
-  parallelism: 5
+  completions: 100
+  parallelism: 100
   template:
     spec:
       containers:
       - name: sendreq
-        imagePullPolicy: Always
-        image: gcr.io/kubecon-223920/sendreq:dev-d4e84f
+        image: gcr.io/kubecon-223920/sendreq:dev-9f8a11
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

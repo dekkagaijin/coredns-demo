@@ -13,3 +13,19 @@ data:
       cache 30
        loadbalance
     }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-grpc
+  namespace: kubecon
+data:
+  Corefile: |
+    grpc//.:53 {
+      errors
+      health
+      prometheus :9153
+      proxy . 8.8.8.8
+      cache 30
+       loadbalance
+    }

@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
         app: coredns-ds
-        deploy: "103"
+        deploy: "114"
     spec:
       containers:
       - name: coredns
@@ -60,7 +60,7 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: coredns
+            name: ds-no-cache-tcp-8
             items:
             - key: Corefile
               path: Corefile

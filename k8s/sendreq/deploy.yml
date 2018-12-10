@@ -12,11 +12,11 @@ spec:
     metadata:
       labels:
         app: sendreq
-        deploy: "28"
+        deploy: "31"
     spec:
       containers:
       - name: sendreq
-        image: gcr.io/kubecon-223920/sendreq:dev-d4e84f
+        image: gcr.io/kubecon-223920/sendreq:dev-9f8ad3
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
